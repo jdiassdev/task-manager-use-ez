@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Tasks\CreateTaskData;
+use App\Data\Tasks\TaskFiltersData;
+use App\Data\Tasks\UpdateTaskData;
 use App\Http\Requests\FilterTaskRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
@@ -17,7 +20,7 @@ class TaskController extends Controller
 
     public function index(FilterTaskRequest $request, Project $project): JsonResponse
     {
-        $tasks = $this->repository->listForProject($project, $request->validated());
+        $tasks = $this->repository->listForProject($project, TaskFiltersData::fromRequest($request));
 
         $paginated = TaskResource::collection($tasks)->response()->getData(true);
 
@@ -32,7 +35,7 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request, Project $project): JsonResponse
     {
-        $task = $this->repository->create($project, $request->validated());
+        $task = $this->repository->create($project, CreateTaskData::fromRequest($request));
 
         return response()->json([
             'message' => 'Tarefa criada com sucesso.',
@@ -43,7 +46,7 @@ class TaskController extends Controller
 
     public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
-        $task = $this->repository->update($task, $request->validated());
+        $task = $this->repository->update($task, UpdateTaskData::fromRequest($request));
 
         return response()->json([
             'message' => 'Tarefa atualizada com sucesso.',

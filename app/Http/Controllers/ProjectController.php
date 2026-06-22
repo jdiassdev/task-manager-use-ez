@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Projects\CreateProjectData;
+use App\Data\Projects\UpdateProjectData;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
@@ -15,18 +17,16 @@ class ProjectController extends Controller
 
     public function index(): JsonResponse
     {
-        $projects = $this->repository->all();
-
         return response()->json([
             'message' => 'Projetos listados com sucesso.',
             'code'    => 200,
-            'data'    => ProjectResource::collection($projects),
+            'data'    => ProjectResource::collection($this->repository->all()),
         ], 200);
     }
 
     public function store(StoreProjectRequest $request): JsonResponse
     {
-        $project = $this->repository->create($request->validated());
+        $project = $this->repository->create(CreateProjectData::fromRequest($request));
 
         return response()->json([
             'message' => 'Projeto criado com sucesso.',
@@ -37,7 +37,7 @@ class ProjectController extends Controller
 
     public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        $project = $this->repository->update($project, $request->validated());
+        $project = $this->repository->update($project, UpdateProjectData::fromRequest($request));
 
         return response()->json([
             'message' => 'Projeto atualizado com sucesso.',
